@@ -52,6 +52,12 @@ if [ ! -e "${srcdir}" ]; then
 	)
 fi
 
+which ${arch}-linux-gnueabihf-gcc > /dev/null 2>&1 || (
+	echo "Could not find gcc to use for crosscompilation."
+	echo "You probably need to change your PATH to include the tools directory"
+	exit 1
+)
+
 which bc > /dev/null 2>&1 || (
 	echo "Installing dependencies needed for building"
 	set -x
