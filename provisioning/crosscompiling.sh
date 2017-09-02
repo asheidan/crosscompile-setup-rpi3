@@ -13,7 +13,11 @@ platform=bcm2709
 ###############################################################################
 srcdir="${root}/linux"
 builddir="${root}/build"
-toolsdir="tools-master/${arch}-bcm2708/gcc-linaro-${cross_compile}raspbian-x64"
+if [ $(uname -m) == "x86_64" ]; then
+	toolsdir="tools-master/${arch}-bcm2708/gcc-linaro-${cross_compile}raspbian-x64"
+else
+	toolsdir="tools-master/${arch}-bcm2708/gcc-linaro-${cross_compile}raspbian"
+fi
 
 ###############################################################################
 make="make -j 3"
