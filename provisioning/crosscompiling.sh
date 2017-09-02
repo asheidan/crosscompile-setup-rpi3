@@ -74,6 +74,7 @@ if [ ! -e "${builddir}/.config" ]; then
 	(
 		set -x
 		cd "${srcdir}"
+		KERNEL=kernel7
 		${make} O="${builddir}" ARCH=${arch} CROSS_COMPILE=${cross_compile} ${platform}_defconfig
 	)
 fi
