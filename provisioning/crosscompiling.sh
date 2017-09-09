@@ -23,9 +23,18 @@ fi
 make="make -j 3"
 ###############################################################################
 
+for tool in curl tar make gcc git; do
+	which $tool > /dev/null 2>&1 || (
+		echo "Could not find ${tool} in your PATH."
+		echo "You should probably install it..."
+		echo "Perhaps: sudo apt-get install $tool"
+		exit 1
+	)
+done
+
 
 if [ ! -e tools.tgz ]; then
-	echo "Downloading tools"
+	echo "### Downloading tools"
 	(
 		set -x
 		curl -L -o tools.tgz https://github.com/raspberrypi/tools/archive/master.tar.gz
@@ -33,7 +42,7 @@ if [ ! -e tools.tgz ]; then
 fi
 
 if [ ! -e "${toolsdir}" ]; then
-	echo "Extracting tools"
+	echo "### Extracting tools"
 	(
 		set -x
 		tar -xzf tools.tgz "${toolsdir}"
@@ -41,7 +50,7 @@ if [ ! -e "${toolsdir}" ]; then
 fi
 
 if [ ! -e "bin" ]; then
-	echo "Symlinking bin-directory"
+	echo "### Symlinking bin-directory"
 	(
 		set -x
 		ln -s "${root}/${toolsdir}"/bin bin
@@ -49,7 +58,7 @@ if [ ! -e "bin" ]; then
 fi
 
 if [ ! -e "${srcdir}" ]; then
-	echo "Cloning kernel repo"
+	echo "### Cloning kernel repo"
 	(
 		set -x
 		git clone --depth=1 https://github.com/raspberrypi/linux
@@ -62,15 +71,8 @@ which ${arch}-linux-gnueabihf-gcc > /dev/null 2>&1 || (
 	exit 1
 )
 
-which bc > /dev/null 2>&1 || (
-	echo "Installing dependencies needed for building"
-	set -x
-	sudo apt-get update
-	sudo apt-get install bc
-)
-
 if [ ! -e "${builddir}/.config" ]; then
-	echo "Configuring kernel"
+	echo "### Configuring kernel"
 	(
 		set -x
 		cd "${srcdir}"
@@ -80,10 +82,11 @@ if [ ! -e "${builddir}/.config" ]; then
 fi
 
 if [ ! -e "${builddir}/arch/${arch}/boot/zImage" ]; then
-	echo "Building kernel (This will take quite a while...)"
-	(
-		set -x
-		cd "${srcdir}"
-		${make} O="${builddir}" ARCH=${arch} CROSS_COMPILE=${cross_compile} zImage modules dtbs
-	)
+	echo "### Building kernel for the first time (This will take quite a while...)"
 fi
+echo "### Building kernel"
+(
+	set -x
+	cd "${srcdir}"
+	time ${make} O="${builddir}" ARCH=${arch} CROSS_COMPILE=${cross_compile} zImage modules dtbs
+)

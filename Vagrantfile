@@ -66,8 +66,9 @@ Vagrant.configure("2") do |config|
   config.vm.provision "file", source: "provisioning/crosscompiling.sh", destination: "crosscompiling.sh"
 
   # https://www.raspberrypi.org/documentation/linux/kernel/building.md
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   # apt-get update
-  #   # apt-get install bc  # Needed for make config
-  # SHELL
+  config.vm.provision "shell", inline: <<-SHELL
+    apt-get update
+    apt-get install curl tar make gcc git
+    apt-get install bc  # Needed for make config
+  SHELL
 end
